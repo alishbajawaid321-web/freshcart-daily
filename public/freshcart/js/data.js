@@ -1255,7 +1255,7 @@ function discountPercent(p) {
   return Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100);
 }
 
-function suggestionsFor(ids: string[], limit = 3) {
+function suggestionsFor(ids, limit = 3) {
   const owned = new Set(ids);
   const cats = ids.map((id) => getProduct(id)?.category).filter(Boolean);
   const wanted = new Set();
@@ -1266,7 +1266,7 @@ function suggestionsFor(ids: string[], limit = 3) {
   return ranked.slice(0, limit);
 }
 
-function relatedTo(product: Product, limit = 4) {
+function relatedTo(product, limit = 4) {
   const same = PRODUCTS.filter(
     (p) => p.id !== product.id && p.category === product.category,
   ).sort((a, b) => b.sold - a.sold);
