@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>My Account — FreshCart</title>
+<meta name="description" content="Manage your FreshCart profile, saved address and review your past grocery orders." />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body data-page="account">
+<section class="wrap section">
+  <h1>My account</h1>
+  <p class="muted">Your details and orders are stored privately in this browser.</p>
+
+  <div class="cart-cols" style="margin-top:1.75rem">
+    <div class="grid" style="gap:1.5rem">
+      <form class="card pad" id="form" novalidate>
+        <h3>Profile & saved address</h3>
+        <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:1rem">
+          <label class="field">Full name<input id="name" /><span class="err hide"></span></label>
+          <label class="field">Email<input id="email" type="email" /><span class="err hide"></span></label>
+          <label class="field">Phone<input id="phone" placeholder="03XX-XXXXXXX" /><span class="err hide"></span></label>
+          <label class="field">City
+            <select id="city"><option>Karachi</option><option>Lahore</option><option>Islamabad</option><option>Rawalpindi</option><option>Faisalabad</option><option>Multan</option><option>Peshawar</option></select>
+          </label>
+        </div>
+        <label class="field">Address<textarea id="address" rows="3"></textarea><span class="err hide"></span></label>
+        <button class="btn" type="submit">Save changes</button>
+      </form>
+
+      <div class="card pad">
+        <h3>Order history</h3>
+        <div id="orders" style="margin-top:.75rem"></div>
+      </div>
+    </div>
+
+    <aside class="grid" style="gap:1rem">
+      <div class="card pad" id="statCard"></div>
+      <div class="card pad">
+        <h3>Preferences</h3>
+        <button class="btn ghost block" style="margin-top:.6rem" onclick="toggleTheme()">Toggle dark mode</button>
+        <a class="btn soft block" style="margin-top:.5rem" href="wishlist.html">View wishlist</a>
+        <button class="btn ghost block" style="margin-top:.5rem" onclick="wipe()">Reset all local data</button>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+function initPage() {
+  ["name", "email", "phone", "address"].forEach((k) => { document.getElementById(k).value = state.profile[k] || ""; });
+  document.getElementById("city").value = state.profile.city || "Karachi";
+  document.getElementById("form").onsubmit = saveProfile;
+  renderOrders();
+  renderStats();
+}
+
+function renderStats() {
+  const spent = state.orders.reduce((s, o) => s + o.total, 0);
+  document.getElementById("statCard").innerHTML = `
+    <h3>${state.profile.name || "Welcome to FreshCart"}</h3>
+    <p class="small muted">${state.profile.city || "Karachi"}</p>
+    <div class="line"><span>Orders placed</span><strong>${state.orders.length}</strong></div>
+    <div class="line"><span>Total spent</span><strong>${money(spent)}</strong></div>
+    <div class="line"><span>Saved items</span><strong>${state.wishlist.length}</strong></div>
+    <div class="line"><span>In cart</span><strong>${cartCount()}</strong></div>`;
+}
+
+function renderOrders() {
+  const host = document.getElementById("orders");
+  if (!state.orders.length) {
+    host.innerHTML = `<p class="small muted">No orders yet. <a href="shop.html" style="color:var(--primary)">Place your first one →</a></p>`;
+    return;
+  }
+  host.innerHTML = `<table class="orders">
+    <thead><tr><th>Order</th><th>Date</th><th>Items</th><th>Total</th><th></th></tr></thead>
+    <tbody>${state.orders.map((o) => `
+      <tr>
+        <td><strong>${o.id}</strong></td>
+        <td>${new Date(o.date).toLocaleDateString("en-GB")}</td>
+        <td>${o.items.reduce((n, i) => n + i.qty, 0)}</td>
+        <td>${money(o.total)}</td>
+        <td><a href="order-confirmation.html?id=${o.id}" style="color:var(--primary);font-weight:700">View</a></td>
+      </tr>`).join("")}</tbody></table>`;
+}
+
+function fail(id, msg) {
+  const err = document.getElementById(id).parentElement.querySelector(".err");
+  err.textContent = msg; err.classList.toggle("hide", !msg);
+  return !msg;
+}
+
+function saveProfile(e) {
+  e.preventDefault();
+  const v = (id) => document.getElementById(id).value.trim();
+  let ok = true;
+  ok = fail("name", v("name").length < 3 ? "Please enter your full name." : "") && ok;
+  ok = fail("email", /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v("email")) ? "" : "Enter a valid email address.") && ok;
+  ok = fail("phone", v("phone") === "" || /^03\d{2}-?\d{7}$/.test(v("phone")) ? "" : "Use a number like 0300-1234567.") && ok;
+  if (!ok) { toast("Please fix the highlighted fields"); return; }
+  state.profile = { name: v("name"), email: v("email"), phone: v("phone"), city: v("city"), address: v("address") };
+  save();
+  renderStats();
+  toast("Profile saved ✅");
+}
+
+function wipe() {
+  localStorage.removeItem(KEY);
+  location.reload();
+}
+</script>
+</body>
+</html>

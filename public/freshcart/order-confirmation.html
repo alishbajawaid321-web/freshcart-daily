@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Order Confirmed — FreshCart</title>
+<meta name="description" content="Your FreshCart grocery order is confirmed and on its way." />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body data-page="order-confirmation">
+<section class="wrap section" id="out"></section>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+function initPage() {
+  const id = qs("id");
+  const o = state.orders.find((x) => x.id === id) || state.orders[0];
+  const host = document.getElementById("out");
+  if (!o) {
+    host.innerHTML = `<div class="empty"><div class="big">📦</div><h1>No order found</h1><a class="btn" href="shop.html">Start shopping</a></div>`;
+    return;
+  }
+  const eta = o.speed === "express" ? "within 30–45 minutes" : "today between 4 PM and 8 PM";
+  host.innerHTML = `
+    <div class="center">
+      <div style="font-size:3.5rem">✅</div>
+      <h1>Thank you, order confirmed!</h1>
+      <p class="muted">Order <strong>${o.id}</strong> is packed with care and arriving ${eta} in ${o.city}.</p>
+    </div>
+    <div class="cart-cols" style="margin-top:2rem">
+      <div class="card pad">
+        <h3>What you ordered</h3>
+        ${o.items.map((i) => `<div class="line"><span>${i.name} × ${i.qty}</span><span>${money(i.price * i.qty)}</span></div>`).join("")}
+        <div class="line"><span>Subtotal</span><strong>${money(o.subtotal)}</strong></div>
+        ${o.discount ? `<div class="line" style="color:var(--primary)"><span>Discount</span><strong>− ${money(o.discount)}</strong></div>` : ""}
+        <div class="line"><span>Delivery</span><strong>${o.delivery === 0 ? "Free" : money(o.delivery)}</strong></div>
+        <div class="line total"><span>Paid via ${o.pay}</span><span>${money(o.total)}</span></div>
+      </div>
+      <aside class="card pad">
+        <h3>Delivery timeline</h3>
+        <ol class="small muted" style="padding-left:1.1rem;display:grid;gap:.6rem;margin-top:.75rem">
+          <li><strong style="color:var(--primary)">Order received</strong> — just now</li>
+          <li>Packing your crate at the FreshCart hub</li>
+          <li>Rider picks up your order</li>
+          <li>Delivered to your door ${eta}</li>
+        </ol>
+        <a class="btn block" href="account.html" style="margin-top:1rem">Track in My Account</a>
+        <a class="btn ghost block" href="shop.html" style="margin-top:.5rem">Keep shopping</a>
+      </aside>
+    </div>`;
+}
+</script>
+</body>
+</html>
