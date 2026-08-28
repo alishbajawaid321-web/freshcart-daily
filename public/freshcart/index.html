@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FreshCart — Online Grocery Store in Pakistan</title>
+<meta name="description" content="Shop fresh produce, dairy, snacks and pantry staples online with FreshCart. Same-day delivery across Pakistan, prices in PKR." />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body data-page="index">
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="pill">🚚 Same-day delivery</span>
+      <h1 style="margin-top:1rem">Fresh groceries.<br /><span style="color:var(--primary)">Happy kitchens.</span></h1>
+      <p class="muted" style="max-width:44ch;font-size:1.05rem">Everything your home needs — mandi-fresh fruit, chilled dairy, chai-time biscuits and pantry staples — delivered to your doorstep.</p>
+      <div class="row" style="margin-top:1.25rem">
+        <a class="btn" href="shop.html">Shop Now</a>
+        <a class="btn ghost" href="categories.html">Explore Categories</a>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><b>69+</b><span class="small muted">Products</span></div>
+        <div class="stat"><b>30 min</b><span class="small muted">Avg. delivery</span></div>
+        <div class="stat"><b>4.9★</b><span class="small muted">Shopper rating</span></div>
+      </div>
+    </div>
+    <div><img src="img/hero.jpg" alt="A paper bag full of fresh groceries" width="1024" height="1024" /></div>
+  </div>
+</section>
+
+<section class="wrap section">
+  <div class="grid perks" id="perks"></div>
+</section>
+
+<section class="wrap section">
+  <div class="between">
+    <div>
+      <span class="pill">Shop by aisle</span>
+      <h2 style="margin-top:.6rem">Every aisle, one basket</h2>
+      <p class="muted">Fifteen well-stocked aisles filled with the things you actually buy every week.</p>
+    </div>
+    <a href="categories.html" style="color:var(--primary);font-weight:700">All categories →</a>
+  </div>
+  <div class="grid cats" id="catGrid" style="margin-top:1.5rem"></div>
+</section>
+
+<section class="wrap section">
+  <div class="between">
+    <div>
+      <span class="pill">⚡ Flash sale</span>
+      <h2 style="margin-top:.6rem">Deals ending soon</h2>
+      <p class="muted">Prices drop back up when the timer hits zero.</p>
+    </div>
+    <div class="countdown" id="countdown"></div>
+  </div>
+  <div class="grid products" id="dealGrid" style="margin-top:1.5rem"></div>
+</section>
+
+<section class="wrap section">
+  <span class="pill">🍫 Snack attack</span>
+  <h2 style="margin-top:.6rem">Chai-time favourites</h2>
+  <div class="grid products" id="snackGrid" style="margin-top:1.5rem"></div>
+</section>
+
+<section class="wrap section">
+  <span class="pill">🌿 Fresh today</span>
+  <h2 style="margin-top:.6rem">Picked this morning</h2>
+  <div class="grid products" id="freshGrid" style="margin-top:1.5rem"></div>
+</section>
+
+<section class="wrap section">
+  <span class="pill">Smart bundles</span>
+  <h2 style="margin-top:.6rem">Grocery bundles, one click</h2>
+  <div class="grid" id="bundleGrid" style="margin-top:1.5rem;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))"></div>
+</section>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+function initPage() {
+  document.getElementById("perks").innerHTML = [
+    ["🚚", "Free delivery over Rs. 2,500", "Standard delivery is just Rs. 149 otherwise."],
+    ["🌿", "Picked at sunrise", "Produce leaves the mandi the same morning."],
+    ["🛡", "Money-back promise", "Not fresh? We refund, no questions."],
+    ["⏰", "Pick your slot", "Express delivery in as little as 30 minutes."],
+  ].map(([i, t, s]) => `<div class="card pad"><div style="font-size:1.5rem">${i}</div><h3 style="margin-top:.5rem">${t}</h3><p class="small muted">${s}</p></div>`).join("");
+
+  document.getElementById("catGrid").innerHTML = CATEGORIES.map((c) => `
+    <a class="card cat-card" href="shop.html?cat=${c.id}">
+      <img src="${categoryImage(c.id)}" alt="${c.name}" width="768" height="768" loading="lazy" decoding="async" />
+      <div class="label">${c.name}</div>
+    </a>`).join("");
+
+  const deals = PRODUCTS.filter((p) => p.deal && p.oldPrice).sort((a,b)=>discountPercent(b)-discountPercent(a)).slice(0, 8);
+  document.getElementById("dealGrid").innerHTML = productGrid(deals);
+
+  const snacks = PRODUCTS.filter((p) => ["snacks","chocolates-sweets","biscuits-cookies"].includes(p.category)).sort((a,b)=>b.sold-a.sold).slice(0,8);
+  document.getElementById("snackGrid").innerHTML = productGrid(snacks);
+
+  const fresh = PRODUCTS.filter((p) => p.fresh).sort((a,b)=>(b.freshness??0)-(a.freshness??0)).slice(0,8);
+  document.getElementById("freshGrid").innerHTML = productGrid(fresh);
+
+  document.getElementById("bundleGrid").innerHTML = BUNDLES.map((b) => `
+    <div class="card pad">
+      <div style="font-size:1.75rem">${b.emoji}</div>
+      <h3 style="margin-top:.4rem">${b.name}</h3>
+      <p class="small muted">${b.tagline}</p>
+      <ul class="small muted" style="padding-left:1.1rem;margin:.5rem 0">${b.items.map((id)=>`<li>${getProduct(id)?.name ?? id}</li>`).join("")}</ul>
+      <div class="price">${money(bundlePrice(b))}</div>
+      <button class="btn block" style="margin-top:.6rem" onclick="addBundle('${b.id}')">Add bundle to cart</button>
+    </div>`).join("");
+
+  startCountdown();
+}
+
+function addBundle(id) {
+  const b = BUNDLES.find((x) => x.id === id);
+  b.items.forEach((pid) => {
+    const line = state.cart.find((l) => l.id === pid);
+    if (line) line.qty += 1; else state.cart.push({ id: pid, qty: 1 });
+  });
+  save(); syncBadges();
+  toast(`${b.name} added — ${b.items.length} items`);
+}
+
+function startCountdown() {
+  const host = document.getElementById("countdown");
+  const end = new Date(); end.setHours(23, 59, 59, 999);
+  const tick = () => {
+    let s = Math.max(0, Math.floor((end - Date.now()) / 1000));
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    host.innerHTML = [["Hours", h], ["Mins", m], ["Secs", sec]]
+      .map(([l, v]) => `<div><b>${String(v).padStart(2, "0")}</b><span>${l}</span></div>`).join("");
+  };
+  tick(); setInterval(tick, 1000);
+}
+</script>
+</body>
+</html>
