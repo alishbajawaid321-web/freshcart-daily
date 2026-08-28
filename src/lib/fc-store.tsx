@@ -50,8 +50,9 @@ const EMPTY_PROFILE: Profile = {
   postal: "",
 };
 
-export const DELIVERY = { standard: 3, express: 6 } as const;
-export const FREE_DELIVERY_OVER = 60;
+export const DELIVERY = { standard: 149, express: 299 } as const;
+export const FREE_DELIVERY_OVER = 2500;
+
 
 type Ctx = {
   ready: boolean;

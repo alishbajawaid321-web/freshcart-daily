@@ -142,13 +142,13 @@ function Shop() {
 
       <div>
         <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-          Price range ($)
+          Price range (Rs.)
         </label>
         <div className="mt-2 grid grid-cols-2 gap-2">
           <input
             type="number"
             min={0}
-            step="0.5"
+            step="50"
             placeholder="Min"
             aria-label="Minimum price"
             className={field}
@@ -160,7 +160,7 @@ function Shop() {
           <input
             type="number"
             min={0}
-            step="0.5"
+            step="50"
             placeholder="Max"
             aria-label="Maximum price"
             className={field}
@@ -171,6 +171,7 @@ function Shop() {
           />
         </div>
       </div>
+
 
       <div>
         <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">

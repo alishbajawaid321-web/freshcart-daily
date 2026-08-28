@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Clock, Leaf, ShieldCheck, Timer, Truck } from "lucide-react";
 import heroImg from "@/assets/fc-hero.jpg";
-import { BUNDLES, CATEGORIES, PRODUCTS, getProduct, money } from "@/lib/fc-data";
+import { BUNDLES, CATEGORIES, PRODUCTS, categoryImage, getProduct, money } from "@/lib/fc-data";
 import { useFreshCart } from "@/lib/fc-store";
 import { ProductGrid } from "@/components/fc/ProductCard";
 import { SectionHeading } from "@/components/fc/bits";
@@ -157,7 +157,7 @@ function Hero() {
 
 function Perks() {
   const perks = [
-    { icon: Truck, title: "Free delivery over $60", text: "Standard delivery is just $3 otherwise." },
+    { icon: Truck, title: "Free delivery over Rs. 2,500", text: "Standard delivery is just Rs. 149 otherwise." },
     { icon: Leaf, title: "Picked at sunrise", text: "Produce leaves the farm the same morning." },
     { icon: ShieldCheck, title: "Money-back promise", text: "Not fresh? We refund, no questions." },
     { icon: Clock, title: "Pick your slot", text: "Express delivery in as little as 30 minutes." },
@@ -190,27 +190,45 @@ function Categories() {
       <SectionHeading
         eyebrow="Shop by aisle"
         title="Every aisle, one basket"
-        subtitle="Ten colourful aisles stocked with the things you actually buy every week."
+        subtitle="Fifteen well-stocked aisles filled with the things you actually buy every week."
         action={{ label: "All categories", to: "/categories" }}
       />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-        {CATEGORIES.map((c) => (
-          <Link
-            key={c.id}
-            to="/shop"
-            search={{ cat: c.id }}
-            className={`fc-lift fc-grain group flex flex-col items-center gap-2 rounded-3xl ${c.tint} px-3 py-6 text-center shadow-soft`}
-          >
-            <span className="text-4xl transition-transform duration-300 group-hover:scale-115">
-              {c.emoji}
-            </span>
-            <span className="text-sm font-bold leading-tight">{c.name}</span>
-          </Link>
-        ))}
+        {CATEGORIES.map((c) => {
+          const cover = categoryImage(c.id);
+          return (
+            <Link
+              key={c.id}
+              to="/shop"
+              search={{ cat: c.id }}
+              className="fc-lift group flex flex-col overflow-hidden rounded-3xl border border-border bg-card text-center shadow-soft"
+            >
+              <div className="aspect-square w-full overflow-hidden bg-white">
+                {cover ? (
+                  <img
+                    src={cover}
+                    alt={c.name}
+                    width={768}
+                    height={768}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                ) : (
+                  <div className={`grid h-full w-full place-items-center text-4xl ${c.tint}`}>
+                    {c.emoji}
+                  </div>
+                )}
+              </div>
+              <span className="px-3 py-3 text-sm font-bold leading-tight">{c.name}</span>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );
 }
+
 
 function Deals() {
   const deals = PRODUCTS.filter((p) => p.deal).slice(0, 8);

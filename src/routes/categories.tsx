@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CATEGORIES, PRODUCTS, money } from "@/lib/fc-data";
+import { CATEGORIES, PRODUCTS, categoryImage, money } from "@/lib/fc-data";
 
 export const Route = createFileRoute("/categories")({
   head: () => ({
@@ -8,13 +8,15 @@ export const Route = createFileRoute("/categories")({
       {
         name: "description",
         content:
-          "Browse every FreshCart aisle: fruit and vegetables, dairy, bakery, meat, grains, snacks, drinks, personal care and household.",
+          "Browse every FreshCart aisle: fresh produce, dairy and eggs, bakery, chocolates, snacks, beverages, rice and grains, tea and coffee, personal care and household.",
       },
       { property: "og:title", content: "Grocery Categories — FreshCart" },
       {
         property: "og:description",
-        content: "Ten colourful aisles of everyday essentials, all one tap away.",
+        content: "Fifteen well-stocked aisles of everyday Pakistani grocery essentials.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: CategoriesPage,
@@ -35,26 +37,44 @@ function CategoriesPage() {
             (min, p) => (p.price < min ? p.price : min),
             items[0]?.price ?? 0,
           );
+          const cover = categoryImage(c.id);
           return (
             <Link
               key={c.id}
               to="/shop"
               search={{ cat: c.id }}
-              className={`fc-lift fc-grain group flex flex-col rounded-3xl ${c.tint} p-6 shadow-soft`}
+              className="fc-lift group flex flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-soft"
             >
-              <div className="flex items-start justify-between gap-3">
-                <span className="text-5xl transition-transform duration-300 group-hover:scale-110">
-                  {c.emoji}
-                </span>
-                <span className="rounded-full bg-card/80 px-3 py-1 text-xs font-bold backdrop-blur">
+              <div className="relative aspect-[16/10] w-full overflow-hidden bg-white">
+                {cover ? (
+                  <img
+                    src={cover}
+                    alt={c.name}
+                    width={768}
+                    height={768}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className={`grid h-full w-full place-items-center text-5xl ${c.tint}`}>
+                    {c.emoji}
+                  </div>
+                )}
+                <span className="absolute right-3 top-3 rounded-full bg-card/90 px-3 py-1 text-xs font-bold backdrop-blur">
                   {items.length} items
                 </span>
               </div>
-              <h2 className="mt-4 text-xl font-bold">{c.name}</h2>
-              <p className="mt-1 flex-1 text-sm text-muted-foreground">{c.blurb}</p>
-              <div className="mt-4 flex items-center justify-between text-sm font-semibold">
-                <span>From {money(cheapest)}</span>
-                <span className="text-primary">Shop aisle →</span>
+              <div className="flex flex-1 flex-col p-5">
+                <h2 className="text-xl font-bold">
+                  <span className="mr-2">{c.emoji}</span>
+                  {c.name}
+                </h2>
+                <p className="mt-1 flex-1 text-sm text-muted-foreground">{c.blurb}</p>
+                <div className="mt-4 flex items-center justify-between text-sm font-semibold">
+                  <span>From {money(cheapest)}</span>
+                  <span className="text-primary">Shop aisle →</span>
+                </div>
               </div>
             </Link>
           );
@@ -63,3 +83,4 @@ function CategoriesPage() {
     </div>
   );
 }
+

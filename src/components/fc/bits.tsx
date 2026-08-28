@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Star } from "lucide-react";
-import { getCategory, type Product } from "@/lib/fc-data";
+import { getCategory, productImage, type Product } from "@/lib/fc-data";
 import { cn } from "@/lib/utils";
 
 export function Stars({ rating, className }: { rating: number; className?: string }) {
@@ -25,38 +25,54 @@ export function ProductTile({
   product,
   size = "md",
   className,
+  priority = false,
 }: {
   product: Product;
   size?: "sm" | "md" | "lg";
   className?: string;
+  priority?: boolean;
 }) {
   const tint = getCategory(product.category)?.tint ?? "bg-pastel-mint";
+  const photo = productImage(product.id);
   return (
     <div
       className={cn(
-        "fc-grain grid place-items-center overflow-hidden rounded-2xl",
-        tint,
+        "grid place-items-center overflow-hidden rounded-2xl bg-white dark:bg-white/95",
+        !photo && tint,
         size === "sm" && "h-20 w-20",
         size === "md" && "aspect-square w-full",
         size === "lg" && "aspect-square w-full",
         className,
       )}
-      role="img"
-      aria-label={product.name}
     >
-      <span
-        className={cn(
-          "select-none drop-shadow-sm transition-transform duration-500 group-hover:scale-110",
-          size === "sm" && "text-3xl",
-          size === "md" && "text-6xl sm:text-7xl",
-          size === "lg" && "text-[8rem] sm:text-[11rem]",
-        )}
-      >
-        {product.emoji}
-      </span>
+      {photo ? (
+        <img
+          src={photo}
+          alt={product.name}
+          width={768}
+          height={768}
+          loading={priority ? "eager" : "lazy"}
+          decoding="async"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.07]"
+        />
+      ) : (
+        <span
+          role="img"
+          aria-label={product.name}
+          className={cn(
+            "select-none drop-shadow-sm transition-transform duration-500 group-hover:scale-110",
+            size === "sm" && "text-3xl",
+            size === "md" && "text-6xl sm:text-7xl",
+            size === "lg" && "text-[8rem] sm:text-[11rem]",
+          )}
+        >
+          {product.emoji}
+        </span>
+      )}
     </div>
   );
 }
+
 
 export function SectionHeading({
   eyebrow,
