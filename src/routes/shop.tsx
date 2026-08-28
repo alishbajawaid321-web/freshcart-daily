@@ -6,13 +6,13 @@ import { ProductGrid } from "@/components/fc/ProductCard";
 import { EmptyState, Skeletons } from "@/components/fc/bits";
 
 type ShopSearch = {
-  q?: string;
-  cat?: string;
-  min?: number;
-  max?: number;
-  rating?: number;
-  discount?: number;
-  sort?: "popular" | "price-asc" | "price-desc" | "rating" | "discount";
+  q?: string | undefined;
+  cat?: string | undefined;
+  min?: number | undefined;
+  max?: number | undefined;
+  rating?: number | undefined;
+  discount?: number | undefined;
+  sort?: "popular" | "price-asc" | "price-desc" | "rating" | "discount" | undefined;
 };
 
 const SORTS: { value: NonNullable<ShopSearch["sort"]>; label: string }[] = [
@@ -29,14 +29,14 @@ export const Route = createFileRoute("/shop")({
       const n = Number(v);
       return Number.isFinite(n) ? n : undefined;
     };
-    const sort = String(search.sort ?? "");
+    const sort = String(search["sort"] ?? "");
     return {
-      q: search.q ? String(search.q) : undefined,
-      cat: search.cat ? String(search.cat) : undefined,
-      min: num(search.min),
-      max: num(search.max),
-      rating: num(search.rating),
-      discount: num(search.discount),
+      q: search["q"] ? String(search["q"]) : undefined,
+      cat: search["cat"] ? String(search["cat"]) : undefined,
+      min: num(search["min"]),
+      max: num(search["max"]),
+      rating: num(search["rating"]),
+      discount: num(search["discount"]),
       sort: SORTS.some((s) => s.value === sort)
         ? (sort as NonNullable<ShopSearch["sort"]>)
         : undefined,
@@ -63,11 +63,11 @@ export const Route = createFileRoute("/shop")({
 function Shop() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
-  const [term, setTerm] = useState(search.q ?? "");
+  const [term, setTerm] = useState(search["q"] ?? "");
   const [loading, setLoading] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  useEffect(() => setTerm(search.q ?? ""), [search.q]);
+  useEffect(() => setTerm(search["q"] ?? ""), [search.q]);
 
   useEffect(() => {
     setLoading(true);
@@ -79,7 +79,7 @@ function Shop() {
     navigate({ search: (prev: ShopSearch) => ({ ...prev, ...patch }) });
 
   const results = useMemo(() => {
-    const q = (search.q ?? "").trim().toLowerCase();
+    const q = (search["q"] ?? "").trim().toLowerCase();
     let list = PRODUCTS.filter((p) => {
       if (q && !`${p.name} ${p.category} ${p.unit}`.toLowerCase().includes(q)) return false;
       if (search.cat && p.category !== search.cat) return false;
@@ -128,7 +128,7 @@ function Shop() {
         </label>
         <select
           className={`${field} mt-2`}
-          value={search.cat ?? ""}
+          value={search["cat"] ?? ""}
           onChange={(e) => update({ cat: e.target.value || undefined })}
         >
           <option value="">All categories</option>
@@ -152,7 +152,7 @@ function Shop() {
             placeholder="Min"
             aria-label="Minimum price"
             className={field}
-            value={search.min ?? ""}
+            value={search["min"] ?? ""}
             onChange={(e) =>
               update({ min: e.target.value === "" ? undefined : Number(e.target.value) })
             }
@@ -164,7 +164,7 @@ function Shop() {
             placeholder="Max"
             aria-label="Maximum price"
             className={field}
-            value={search.max ?? ""}
+            value={search["max"] ?? ""}
             onChange={(e) =>
               update({ max: e.target.value === "" ? undefined : Number(e.target.value) })
             }
