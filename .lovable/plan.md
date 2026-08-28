@@ -1,48 +1,58 @@
-# FreshCart v2 — Real Supermarket Upgrade
+# FreshCart — Pakistani Online Supermarket (v2)
 
-The current build has the FreshCart shell working (11 pages, cart, wishlist, orders, dark mode, toasts, localStorage) but uses emoji tiles instead of product photos and only 35 products. This plan replaces the visual layer with realistic product photography, grows the catalogue to a full supermarket, and adds the new home sections.
+The FreshCart shell already works (11 pages, cart, wishlist, orders, dark mode, toasts, countdown, localStorage). This plan turns it into a realistic Pakistani supermarket: PKR everywhere, 15 categories, 60+ products, and real product photography instead of emoji tiles.
 
-## 1. Real product photography
+## 1. Currency: PKR only
 
-Every product gets its own photo-realistic studio product shot, matching exactly what it is: a milk carton for Milk, a chips packet for Potato Chips, a chocolate bar for Chocolate, a shampoo bottle for Shampoo, loose produce on white for fruit and veg.
+Every money value becomes `Rs. 1,250` style, thousand-separated, no decimals — product cards, product detail, bundles, cart, delivery fee, discount, total, checkout, order confirmation, order history, deals, surprise discount. No `$`, `€`, `£` anywhere in the codebase.
 
-- Rendered as high-fidelity photographic product images (white/neutral studio background, e-commerce catalogue style, generic packaging with no real trademarks), stored in `src/assets/products/` and reused by the static copy at `public/freshcart/assets/images/`.
-- No emojis, cartoons, illustrations, colored boxes or repeated generic images anywhere a product image belongs.
-- Files are local, so nothing can 404 the way hotlinked external URLs do.
-- Emoji stays only as small decorative accents (category chips, section labels), never as a product image.
-- One photographic supermarket hero image plus 9 category cover photos.
+Pakistani-realistic pricing and fees: delivery Rs. 150 standard / Rs. 300 express, free over Rs. 3,000. Phone format `03XX-XXXXXXX`, cities Karachi, Lahore, Islamabad, Rawalpindi, Faisalabad, Multan, Peshawar, Quetta.
 
-## 2. Catalogue: 60+ products, 9 categories
+## 2. Real product photography
 
-Categories: Fresh Produce, Dairy & Eggs, Bakery, Chocolates & Sweets, Snacks, Beverages, Pantry (rice/grains/cooking), Personal Care, Household.
+Every product gets its own photographic product shot that matches the actual item — milk carton for Milk, chips packet for Potato Chips, chocolate bar for Chocolate, biscuit pack for Biscuits, supermarket-style loose apples for Apples, shampoo bottle for Shampoo.
 
-Every product carries name, category, realistic price, optional original price + discount, rating, review count, unit size, description, tags (fresh / new / bestseller), and its own image. Coverage follows the requested lists: produce (apples, bananas, oranges, mangoes, grapes, watermelon, strawberries, tomatoes, potatoes, onions, carrots, cucumbers, spinach, lettuce, peppers), dairy (milk, chocolate milk, yogurt, greek yogurt, butter, cheese, cream, eggs), bakery (white/brown bread, croissants, muffins, donuts, burger buns, cake, cookies), a large chocolates and sweets aisle (milk/dark/white chocolate, bars, boxes, wafers, truffles, caramels, gummies, lollipops, toffees, marshmallows), snacks (chips, tortilla chips, nachos, popcorn, cheese puffs, crackers, pretzels, biscuits, nuts), beverages (water, cola, lemon-lime, orange soda, energy drink, apple/orange/mango juice, iced tea, coffee, tea), pantry (basmati and brown rice, flour, oats, pasta, spaghetti, macaroni, lentils, chickpeas, beans, cereal, cooking and olive oil, sugar, salt, spices, ketchup, mayo, hot sauce, soy sauce, peanut butter, jam, honey), personal care (shampoo, conditioner, body wash, soap, toothpaste, toothbrush, face wash, hand wash, lotion, deodorant), household (dish liquid, detergent, floor and glass cleaner, tissues, paper towels, trash bags, sponges, brushes).
+- Images are produced as photo-realistic studio/supermarket photography (neutral background, consistent lighting, generic packaging with no real trademarks) and stored locally in `src/assets/products/`, mirrored to `public/freshcart/assets/images/` for the static copy.
+- Local files mean nothing 404s the way hotlinked stock URLs do, and each product has a unique image — no duplicates, no placeholders, no emoji, no cartoons or illustrations anywhere a product image belongs.
+- Plus one supermarket hero photo, one sale-banner photo, and 10 category cover photos.
+- Emoji survive only as tiny decorative labels in section headings and category chips.
 
-## 3. Home page rebuild
+## 3. Catalogue: 60+ products, 15 categories
 
-- Hero: "Everything Fresh. Everything You Need." with the requested subheading, Shop Now and Explore Categories, real supermarket photography, subtle entrance animation.
-- Weekend Grocery Sale banner — up to 30% off, Shop Deals button.
-- Shop by Category: 9 large photo cards, each linking to the shop pre-filtered.
-- Best Sellers: 16–20 products.
-- Snack Attack: dedicated colourful chocolate/snack zone, 12 products, View All Snacks button.
-- Fresh Today: premium produce strip with "🌿 Fresh Today" and "Farm Fresh" badges.
-- Flash Deals: discounted grid with a real JS countdown (02:14:36 style) and per-card original/sale/percent.
-- Smart Grocery Bundles: Breakfast, Movie Night, Healthy Basket, Home Cleaning — one-click add-all.
+Fresh Produce, Dairy & Eggs, Bakery, Chocolates & Sweets, Snacks, Biscuits & Cookies, Beverages, Tea & Coffee, Rice & Grains, Pantry & Cooking, Pasta & Instant Food, Nuts & Dry Fruits, Frozen Food, Personal Care, Household.
 
-## 4. Shop, product, cart, checkout refinements
+Each product: unique name, category, unit size, PKR price, optional original price + discount %, rating, review count, description, tags (fresh / new / bestseller), unique image. Coverage follows the requested item lists per category (produce through household, including the full chocolates/sweets, snacks, biscuits, beverages, frozen, personal care and household aisles).
 
-- Shop: live search across 60+ products with the "Oops! We couldn't find that product." empty state, category chips, min/max price, rating filters (4+, 3+), and sorting by Recommended / Price ↑ / Price ↓ / Highest Rated / Biggest Discount / Newest. 2 columns on mobile, 3 on tablet, 4–5 on desktop.
-- Product detail: large photo, rating, reviews, price/discount, description, quantity, Add to Cart, Buy Now, Wishlist, and category-aware "You May Also Like".
-- Cart: photos in line items, quantity controls, per-line totals, subtotal / delivery / discount / total, "Feeling Lucky? 🎁 Reveal My Discount" with a 5–20% animated reveal saved to localStorage, smart category recommendations after each add.
-- Checkout, order success, account, about, contact keep their current working behaviour; account gains an Account Settings block, wishlist empty state becomes "Your wishlist is waiting for something delicious! 🍫".
+## 4. Home page
 
-## 5. Static HTML/CSS/JS copy
+- Hero: "Fresh groceries. Delivered to your door." with the requested subheading, Shop Now / Explore Categories, real supermarket photograph, 🌿 Freshness Guaranteed badge.
+- Weekend Grocery Sale banner — UP TO 30% OFF, Shop Deals.
+- Shop by Category: 10 photo cards that deep-link into a pre-filtered shop.
+- Best Sellers: 16–20 cards with photo, name, category, Rs. price, original price, discount, rating, review count, wishlist, add to cart.
+- Snack Attack 🍫: 10–12 chocolates/chips/biscuits/drinks, View All Snacks.
+- Fresh Today 🌿: produce strip with Farm Fresh / Fresh Today / Best Quality badges.
+- Flash Deals with a live JS countdown (02:14:36 style) and original/sale/percent per card.
+- Smart Grocery Bundles: Breakfast, Movie Night, Healthy Basket, Cleaning — bundle price in PKR, one-click Add Bundle to Cart.
+- Nav gains Deals and Bundles links alongside Home, Shop, Categories, About, Contact, with search, wishlist count, cart count, account, theme toggle, hamburger on mobile.
 
-The standalone version in `public/freshcart/` is built from the same catalogue and the same image files: `index.html`, `shop.html`, `product.html`, `categories.html`, `wishlist.html`, `cart.html`, `checkout.html`, `order-success.html`, `account.html`, `about.html`, `contact.html`, plus `css/style.css`, `js/products.js`, `app.js`, `cart.js`, `wishlist.js`, `product.js`, `checkout.js`, and `assets/images/`. Hand-written CSS, no framework, opens directly in a browser.
+## 5. Shop, product, cart, checkout
+
+- Shop: real-time search ("Search groceries, snacks, chocolates..."), category chips, min/max PKR, rating 4+/3+, sorting Recommended / Price ↑ / Price ↓ / Highest Rated / Biggest Discount, empty state, 2 / 3 / 4–5 columns.
+- Product detail: large photo, category, rating, reviews, PKR price and discount, description, quantity selector, Add to Cart, Buy Now, Add to Wishlist, category-based You May Also Like.
+- Cart: photo line items, quantity controls, per-line totals, Subtotal / Delivery / Discount / Total in Rs., "Feeling Lucky? 🎁 Reveal My Discount" random 5–20% applied and persisted, smart "You might also need..." recommendations with quick Add.
+- Checkout: customer info, Pakistani address fields with city select, standard/express delivery, Cash on Delivery / Card (JS-revealed card fields) / Digital Wallet, validation, live PKR summary.
+- Order confirmation: `#FC82941` order number, items, PKR total, address, delivery method, ETA, saved to localStorage.
+- Account: profile, saved address, wishlist summary, settings, order history with Confirmed / Preparing / Out for Delivery / Delivered.
+- Wishlist empty state: "Your wishlist is waiting for something delicious! 🍫".
+- About: mission, five value pillars, scroll-animated stats (10,000+ / 500+ / 50+ / 24/7). Contact: validated form with toast success.
+
+## 6. Static HTML/CSS/JS copy
+
+`public/freshcart/` gets the exact requested structure — `index.html`, `shop.html`, `product.html`, `categories.html`, `wishlist.html`, `cart.html`, `checkout.html`, `order-success.html`, `account.html`, `about.html`, `contact.html`, `css/style.css`, `js/products.js`, `app.js`, `cart.js`, `wishlist.js`, `product.js`, `checkout.js`, `assets/images/` — hand-written CSS, vanilla JS, same catalogue, same images, same PKR formatting. Opens directly in a browser and at `/freshcart/index.html`.
 
 ## Technical notes
 
-- Product data stays in one module (`src/lib/fc-data.ts`) with an `image` field per product; images are ES6 imports so they are hashed and bundled. The static copy mirrors the same data in `js/products.js` with relative image paths.
-- Image generation runs in batches; product images are square, consistent lighting and background so the grid looks like one catalogue.
-- Design tokens, dark mode, toasts, floating mobile cart and localStorage layer already in place are kept and extended, not rewritten.
+- One catalogue module (`src/lib/fc-data.ts`) with an `image` field per product and a single `money()` helper emitting `Rs. 1,250`; the static copy mirrors both in `js/products.js`.
+- Product images generated in batches, square and visually consistent so the grid reads as one catalogue.
+- Existing design tokens, dark mode, toasts, floating mobile cart and localStorage layer are extended, not rewritten; storage keys cover cart, wishlist, orders, theme, surpriseDiscount, userInformation.
 - Verified at 320 / 375 / 425 / 768 / 1024 / 1440 px with no horizontal scroll, and every image checked to render.
