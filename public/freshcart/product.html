@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Product Details — FreshCart</title>
+<meta name="description" content="Product details, reviews and delivery information for FreshCart grocery items." />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body data-page="product">
+<section class="wrap section" id="detail"></section>
+<section class="wrap section">
+  <h2>You may also like</h2>
+  <div class="grid products" id="related" style="margin-top:1.25rem"></div>
+</section>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+let qty = 1;
+let current;
+
+function initPage() {
+  current = getProduct(qs("id") || "");
+  const host = document.getElementById("detail");
+  if (!current) {
+    host.innerHTML = `<div class="empty"><div class="big">🧺</div><h1>Product not found</h1><p class="muted">That item is no longer on our shelves.</p><a class="btn" href="shop.html">Back to shop</a></div>`;
+    return;
+  }
+  document.title = `${current.name} — FreshCart`;
+  const off = discountPercent(current);
+  const saved = state.wishlist.includes(current.id);
+  host.innerHTML = `
+    <p class="small muted"><a href="shop.html">Shop</a> / <a href="shop.html?cat=${current.category}">${getCategory(current.category)?.name}</a> / ${current.name}</p>
+    <div class="two-col" style="grid-template-columns:1fr;margin-top:1rem">
+      <div class="grid" style="grid-template-columns:1fr;gap:2rem">
+        <div class="grid" style="grid-template-columns:1fr;gap:2rem" id="split"></div>
+      </div>
+    </div>`;
+  document.getElementById("split").outerHTML = `
+    <div class="grid" style="grid-template-columns:1fr;gap:2rem" id="split2">
+      <div class="card" style="background:#fff"><img src="${productImage(current.id)}" alt="${current.name}" width="768" height="768" /></div>
+      <div>
+        <span class="pill">${getCategory(current.category)?.name}</span>
+        <h1 style="margin-top:.75rem">${current.name}</h1>
+        <p class="muted">${current.unit}</p>
+        <div class="row">${starRow(current.rating)} <span class="small muted">· ${current.reviews} reviews · ${current.sold} sold</span></div>
+        <div style="margin:1rem 0"><span class="price" style="font-size:2rem">${money(current.price)}</span>${current.oldPrice ? `<span class="old">${money(current.oldPrice)}</span>` : ""}${off ? ` <span class="tag-off" style="position:static">−${off}%</span>` : ""}</div>
+        <p>${current.description}</p>
+        ${current.fresh && current.freshness ? `<p class="small" style="color:var(--primary)">🌿 Freshness score ${current.freshness}%</p>` : ""}
+        <div class="row" style="margin:1.25rem 0">
+          <div class="qty"><button onclick="bump(-1)" aria-label="Decrease">−</button><span id="qty">1</span><button onclick="bump(1)" aria-label="Increase">+</button></div>
+          <button class="btn" onclick="addToCart('${current.id}', qty)">Add to Cart</button>
+          <button class="btn ghost" data-wish="${current.id}" onclick="toggleWishlist('${current.id}')">${saved ? "♥ Saved" : "♡ Wishlist"}</button>
+        </div>
+        <div class="card pad small muted">
+          🚚 Free delivery over Rs. 2,500 · standard Rs. 149 · express Rs. 299<br />
+          🛡 Not fresh on arrival? Full refund, no questions asked.
+        </div>
+      </div>
+    </div>`;
+  if (window.matchMedia("(min-width: 900px)").matches) {
+    document.getElementById("split2").style.gridTemplateColumns = "1fr 1fr";
+  }
+  renderReviews();
+  document.getElementById("related").innerHTML = productGrid(relatedTo(current, 4));
+}
+
+function bump(d) {
+  qty = Math.max(1, qty + d);
+  document.getElementById("qty").textContent = qty;
+}
+
+function renderReviews() {
+  const names = ["Ayesha K.", "Bilal R.", "Hina S.", "Usman A."];
+  const notes = [
+    "Arrived neatly packed and exactly as pictured. Ordering again.",
+    "Good quality for the price — delivery was quicker than expected.",
+    "This has become a weekly staple for our家 kitchen. Very fresh.",
+    "Packaging was sealed and clean. Rider was polite and on time.",
+  ].map((t) => t.replace("家 ", ""));
+  const html = names.map((n, i) => `
+    <div class="card pad">
+      <div class="between"><strong>${n}</strong><span class="stars">${"★".repeat(5 - (i % 2))}${"☆".repeat(i % 2)}</span></div>
+      <p class="small muted" style="margin:.5rem 0 0">${notes[i]}</p>
+    </div>`).join("");
+  document.getElementById("detail").insertAdjacentHTML("beforeend",
+    `<div style="margin-top:2.5rem"><h2>Customer reviews</h2><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin-top:1rem">${html}</div></div>`);
+}
+</script>
+</body>
+</html>

@@ -176,7 +176,7 @@ function ProductPage() {
 
           <ul className="mt-7 grid gap-2 text-sm sm:grid-cols-3">
             {[
-              { icon: Truck, text: "Delivery from $3" },
+              { icon: Truck, text: "Delivery from Rs. 149" },
               { icon: ShieldCheck, text: "Freshness promise" },
               { icon: RotateCcw, text: "Easy returns" },
             ].map((f) => (

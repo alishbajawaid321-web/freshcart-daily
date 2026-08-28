@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>My Wishlist — FreshCart</title>
+<meta name="description" content="Everything you saved for later on FreshCart, stored right in your browser." />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body data-page="wishlist">
+<section class="wrap section">
+  <h1>Saved for later</h1>
+  <p class="muted" id="lead"></p>
+  <div class="row" id="actions" style="margin:1rem 0"></div>
+  <div class="grid products" id="grid"></div>
+  <div class="empty hide" id="empty"><div class="big">♡</div><h3>Your wishlist is empty</h3><p class="muted">Tap the heart on any product to save it here.</p><a class="btn" href="shop.html">Browse the shop</a></div>
+</section>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+function initPage() { renderWish(); }
+
+function renderWish() {
+  const items = state.wishlist.map(getProduct).filter(Boolean);
+  document.getElementById("lead").textContent = `${items.length} item${items.length === 1 ? "" : "s"} waiting in your wishlist.`;
+  document.getElementById("grid").innerHTML = productGrid(items);
+  document.getElementById("empty").classList.toggle("hide", items.length > 0);
+  document.getElementById("actions").innerHTML = items.length
+    ? `<button class="btn" onclick="addAll()">Add all to cart</button><button class="btn ghost" onclick="clearWish()">Clear wishlist</button>`
+    : "";
+}
+function addAll() {
+  state.wishlist.forEach((id) => {
+    const line = state.cart.find((l) => l.id === id);
+    if (line) line.qty += 1; else state.cart.push({ id, qty: 1 });
+  });
+  save(); syncBadges();
+  toast("Wishlist moved into your cart");
+}
+function clearWish() { state.wishlist = []; save(); syncBadges(); renderWish(); toast("Wishlist cleared"); }
+const _tw = toggleWishlist;
+toggleWishlist = (id) => { _tw(id); renderWish(); };
+</script>
+</body>
+</html>

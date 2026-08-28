@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Checkout — FreshCart</title>
+<meta name="description" content="Enter your delivery details, pick a slot and place your FreshCart grocery order." />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body data-page="checkout">
+<section class="wrap section">
+  <h1>Checkout</h1>
+  <p class="muted">Delivering across Karachi, Lahore, Islamabad, Rawalpindi, Faisalabad, Multan and Peshawar.</p>
+  <div class="cart-cols" style="margin-top:1.5rem">
+    <form class="card pad" id="form" novalidate>
+      <h3>Delivery details</h3>
+      <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:1rem">
+        <label class="field">Full name<input id="name" /><span class="err hide"></span></label>
+        <label class="field">Email<input id="email" type="email" /><span class="err hide"></span></label>
+        <label class="field">Phone<input id="phone" placeholder="03XX-XXXXXXX" /><span class="err hide"></span></label>
+        <label class="field">City
+          <select id="city">
+            <option>Karachi</option><option>Lahore</option><option>Islamabad</option>
+            <option>Rawalpindi</option><option>Faisalabad</option><option>Multan</option><option>Peshawar</option>
+          </select><span class="err hide"></span>
+        </label>
+      </div>
+      <label class="field">Full address<textarea id="address" rows="3" placeholder="House / flat, street, area, nearest landmark"></textarea><span class="err hide"></span></label>
+
+      <h3 style="margin-top:1.5rem">Delivery speed</h3>
+      <div class="row" style="flex-wrap:wrap;margin-top:.6rem">
+        <button type="button" class="chip on" data-speed="standard" onclick="setSpeed('standard')">Standard · Rs. 149 (free over Rs. 2,500)</button>
+        <button type="button" class="chip" data-speed="express" onclick="setSpeed('express')">Express · Rs. 299 (30 min)</button>
+      </div>
+
+      <h3 style="margin-top:1.5rem">Payment method</h3>
+      <div class="row" style="flex-wrap:wrap;margin-top:.6rem">
+        <button type="button" class="chip on" data-pay="cod" onclick="setPay('cod')">Cash on delivery</button>
+        <button type="button" class="chip" data-pay="card" onclick="setPay('card')">Debit / credit card</button>
+        <button type="button" class="chip" data-pay="easypaisa" onclick="setPay('easypaisa')">Easypaisa</button>
+        <button type="button" class="chip" data-pay="jazzcash" onclick="setPay('jazzcash')">JazzCash</button>
+      </div>
+
+      <button class="btn block" style="margin-top:1.75rem" type="submit">Place order</button>
+    </form>
+    <aside class="card pad" id="summary"></aside>
+  </div>
+  <div class="empty hide" id="empty"><div class="big">🛒</div><h3>Nothing to check out</h3><a class="btn" href="shop.html">Fill your basket</a></div>
+</section>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+let speed = "standard";
+let pay = "cod";
+
+function initPage() {
+  if (!state.cart.length) {
+    document.getElementById("empty").classList.remove("hide");
+    document.querySelector(".cart-cols").classList.add("hide");
+    return;
+  }
+  ["name", "email", "phone", "address"].forEach((k) => { document.getElementById(k).value = state.profile[k] || ""; });
+  document.getElementById("city").value = state.profile.city || "Karachi";
+  document.getElementById("form").onsubmit = submit;
+  renderSummary();
+}
+
+function setSpeed(s) {
+  speed = s;
+  document.querySelectorAll("[data-speed]").forEach((b) => b.classList.toggle("on", b.dataset.speed === s));
+  renderSummary();
+}
+function setPay(p) {
+  pay = p;
+  document.querySelectorAll("[data-pay]").forEach((b) => b.classList.toggle("on", b.dataset.pay === p));
+}
+
+function renderSummary() {
+  const d = state.discount;
+  const fee = deliveryFee(speed);
+  document.getElementById("summary").innerHTML = `
+    <h3>Order summary</h3>
+    <div style="margin:.75rem 0">
+      ${state.cart.map((l) => { const p = getProduct(l.id); return `<div class="line"><span>${p.name} × ${l.qty}</span><span>${money(p.price * l.qty)}</span></div>`; }).join("")}
+    </div>
+    <div class="line"><span>Subtotal</span><strong>${money(subtotal())}</strong></div>
+    ${d ? `<div class="line" style="color:var(--primary)"><span>Discount ${d.percent}%</span><strong>− ${money(discountAmount())}</strong></div>` : ""}
+    <div class="line"><span>Delivery (${speed})</span><strong>${fee === 0 ? "Free" : money(fee)}</strong></div>
+    <div class="line total"><span>Total</span><span>${money(grandTotal(speed))}</span></div>`;
+}
+
+function fail(id, msg) {
+  const err = document.getElementById(id).parentElement.querySelector(".err");
+  err.textContent = msg;
+  err.classList.toggle("hide", !msg);
+  return !msg;
+}
+
+function submit(e) {
+  e.preventDefault();
+  const v = (id) => document.getElementById(id).value.trim();
+  let ok = true;
+  ok = fail("name", v("name").length < 3 ? "Please enter your full name." : "") && ok;
+  ok = fail("email", /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v("email")) ? "" : "Enter a valid email address.") && ok;
+  ok = fail("phone", /^03\d{2}-?\d{7}$/.test(v("phone")) ? "" : "Use a Pakistani mobile number like 0300-1234567.") && ok;
+  ok = fail("address", v("address").length < 12 ? "Add a bit more address detail so the rider finds you." : "") && ok;
+  if (!ok) { toast("Please fix the highlighted fields"); return; }
+
+  state.profile = { name: v("name"), email: v("email"), phone: v("phone"), city: v("city"), address: v("address") };
+  const order = {
+    id: "FC" + Date.now().toString().slice(-8),
+    date: new Date().toISOString(),
+    items: state.cart.map((l) => ({ id: l.id, name: getProduct(l.id).name, qty: l.qty, price: getProduct(l.id).price })),
+    subtotal: subtotal(),
+    discount: discountAmount(),
+    delivery: deliveryFee(speed),
+    total: grandTotal(speed),
+    speed, pay,
+    city: v("city"),
+  };
+  state.orders = [order, ...state.orders];
+  clearCart();
+  save();
+  location.href = `order-confirmation.html?id=${order.id}`;
+}
+</script>
+</body>
+</html>

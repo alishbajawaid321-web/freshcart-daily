@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Shopping Cart — FreshCart</title>
+<meta name="description" content="Review your FreshCart basket, spin a surprise discount and head to checkout. All totals in PKR." />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body data-page="cart">
+<section class="wrap section">
+  <h1>Your basket</h1>
+  <div class="cart-cols" style="margin-top:1.5rem">
+    <div>
+      <div class="card" id="lines"></div>
+      <div id="suggestions" style="margin-top:1.5rem"></div>
+    </div>
+    <aside class="card pad" id="summary"></aside>
+  </div>
+  <div class="empty hide" id="empty"><div class="big">🛒</div><h3>Your cart is empty</h3><p class="muted">Fill it with fresh things you love.</p><a class="btn" href="shop.html">Start shopping</a></div>
+</section>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+function initPage() { renderCart(); }
+
+function renderCart() {
+  const items = state.cart.map((l) => ({ line: l, p: getProduct(l.id) })).filter((x) => x.p);
+  const isEmpty = items.length === 0;
+  document.getElementById("empty").classList.toggle("hide", !isEmpty);
+  document.querySelector(".cart-cols").classList.toggle("hide", isEmpty);
+  if (isEmpty) return;
+
+  document.getElementById("lines").innerHTML = items.map(({ line, p }) => `
+    <div class="cart-item">
+      <img src="${productImage(p.id)}" alt="${p.name}" width="768" height="768" loading="lazy" />
+      <div>
+        <div class="between">
+          <div>
+            <a class="name" href="product.html?id=${p.id}" style="font-family:Outfit,sans-serif;font-weight:700">${p.name}</a>
+            <div class="small muted">${p.unit} · ${money(p.price)} each</div>
+          </div>
+          <div style="text-align:right">
+            <div class="price">${money(p.price * line.qty)}</div>
+            <button class="chip" style="margin-top:.4rem" onclick="dropItem('${p.id}')">Remove</button>
+          </div>
+        </div>
+        <div class="qty" style="margin-top:.6rem">
+          <button onclick="changeQty('${p.id}', ${line.qty - 1})" aria-label="Decrease">−</button>
+          <span>${line.qty}</span>
+          <button onclick="changeQty('${p.id}', ${line.qty + 1})" aria-label="Increase">+</button>
+        </div>
+      </div>
+    </div>`).join("");
+
+  const d = state.discount;
+  const fee = deliveryFee("standard");
+  document.getElementById("summary").innerHTML = `
+    <h3>Order summary</h3>
+    <div class="line"><span>Subtotal (${cartCount()} items)</span><strong>${money(subtotal())}</strong></div>
+    ${d ? `<div class="line" style="color:var(--primary)"><span>Discount (${d.code} · ${d.percent}%)</span><strong>− ${money(discountAmount())}</strong></div>` : ""}
+    <div class="line"><span>Delivery</span><strong>${fee === 0 ? "Free" : money(fee)}</strong></div>
+    <div class="line total"><span>Total</span><span>${money(grandTotal("standard"))}</span></div>
+    ${subtotal() < FREE_DELIVERY_OVER ? `<p class="small muted">Add ${money(FREE_DELIVERY_OVER - subtotal())} more for free delivery.</p>` : `<p class="small" style="color:var(--primary)">You've unlocked free delivery 🎉</p>`}
+    <div class="card pad" style="margin-top:1rem;box-shadow:none;background:var(--primary-soft)">
+      <strong>🎁 Surprise discount</strong>
+      <p class="small" style="margin:.35rem 0">${d ? `Code <strong>${d.code}</strong> is applied — ${d.percent}% off.` : "Spin once per basket and see what you win."}</p>
+      <button class="btn ${d ? "ghost" : ""} block" onclick="spinDiscount()">${d ? "Spin again" : "Spin for a discount"}</button>
+    </div>
+    <a class="btn block" href="checkout.html" style="margin-top:1rem">Proceed to checkout</a>
+    <button class="btn ghost block" style="margin-top:.5rem" onclick="emptyCart()">Clear cart</button>`;
+  renderSuggestions();
+}
+
+function changeQty(id, q) { setQty(id, q); renderCart(); }
+function dropItem(id) { const n = getProduct(id).name; removeFromCart(id); renderCart(); toast(`${n} removed`); }
+function emptyCart() { clearCart(); renderCart(); toast("Cart cleared"); }
+const _add = addToCart;
+addToCart = (id, q) => { _add(id, q); renderCart(); };
+</script>
+</body>
+</html>
