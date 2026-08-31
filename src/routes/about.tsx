@@ -16,6 +16,8 @@ export const Route = createFileRoute("/about")({
         property: "og:description",
         content: "Why 10,000+ shoppers trust FreshCart with their weekly groceries.",
       },
+      { property: "og:image", content: "https://project--e178b9d6-97e4-412b-a71c-56d7d12a4462.lovable.app/og-freshcart.jpg" },
+      { name: "twitter:image", content: "https://project--e178b9d6-97e4-412b-a71c-56d7d12a4462.lovable.app/og-freshcart.jpg" },
     ],
   }),
   component: AboutPage,

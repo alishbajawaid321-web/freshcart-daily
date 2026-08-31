@@ -55,6 +55,8 @@ export const Route = createFileRoute("/shop")({
         property: "og:description",
         content: "Search and filter fresh produce, dairy, bakery, snacks and household staples.",
       },
+      { property: "og:image", content: "https://project--e178b9d6-97e4-412b-a71c-56d7d12a4462.lovable.app/og-freshcart.jpg" },
+      { name: "twitter:image", content: "https://project--e178b9d6-97e4-412b-a71c-56d7d12a4462.lovable.app/og-freshcart.jpg" },
     ],
   }),
   component: Shop,

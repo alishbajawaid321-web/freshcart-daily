@@ -16,6 +16,8 @@ export const Route = createFileRoute("/cart")({
       },
       { property: "og:title", content: "Shopping Cart — FreshCart" },
       { property: "og:description", content: "Your basket, totals and delivery fee at a glance." },
+      { property: "og:image", content: "https://project--e178b9d6-97e4-412b-a71c-56d7d12a4462.lovable.app/og-freshcart.jpg" },
+      { name: "twitter:image", content: "https://project--e178b9d6-97e4-412b-a71c-56d7d12a4462.lovable.app/og-freshcart.jpg" },
     ],
   }),
   component: CartPage,

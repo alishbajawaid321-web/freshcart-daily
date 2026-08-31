@@ -15,6 +15,8 @@ export const Route = createFileRoute("/wishlist")({
       },
       { property: "og:title", content: "My Wishlist — FreshCart" },
       { property: "og:description", content: "Your saved FreshCart groceries, ready when you are." },
+      { property: "og:image", content: "https://project--e178b9d6-97e4-412b-a71c-56d7d12a4462.lovable.app/og-freshcart.jpg" },
+      { name: "twitter:image", content: "https://project--e178b9d6-97e4-412b-a71c-56d7d12a4462.lovable.app/og-freshcart.jpg" },
     ],
   }),
   component: WishlistPage,
