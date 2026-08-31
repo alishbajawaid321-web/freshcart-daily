@@ -10,18 +10,20 @@ import { SectionHeading } from "@/components/fc/bits";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "FreshCart — Fresh Groceries Delivered To Your Door" },
+      { title: "FreshCart — Online Grocery Delivery in Pakistan" },
       {
         name: "description",
         content:
-          "Shop farm-fresh fruit, dairy, bakery and pantry staples on FreshCart. Daily deals, money-saving bundles and same-day grocery delivery.",
+          "Shop fresh produce, dairy, bakery, snacks and pantry staples in PKR. Same-day delivery across Pakistan, free over Rs. 2,500.",
       },
-      { property: "og:title", content: "FreshCart — Fresh Groceries Delivered To Your Door" },
+      { property: "og:title", content: "FreshCart — Online Grocery Delivery in Pakistan" },
       {
         property: "og:description",
         content:
-          "Daily deals, grocery bundles and same-day delivery from local suppliers. Fresh products or your money back.",
+          "Shop fresh produce, dairy, bakery, snacks and pantry staples in PKR. Same-day delivery across Pakistan, free over Rs. 2,500.",
       },
+      { property: "og:image", content: "https://project--e178b9d6-97e4-412b-a71c-56d7d12a4462.lovable.app/og-freshcart.jpg" },
+      { name: "twitter:image", content: "https://project--e178b9d6-97e4-412b-a71c-56d7d12a4462.lovable.app/og-freshcart.jpg" },
     ],
   }),
   component: Home,
